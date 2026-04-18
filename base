@@ -1,0 +1,2 @@
+--template dictdef2 -kname int -ktype int -vname int -vtype int -kequals 'a == b' -keysmallerthansizet -hashtrivial
+--template dictdef2 -kname string -ktype 'char *' -refkey 'a' -freekey 'free(a)' -zerokey '!a' -vname int -vtype int -kequals 'strcmp(a, b) == 0'

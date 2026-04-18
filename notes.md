@@ -1,0 +1,3 @@
+- Change the order of checking to uint64, uint32, uint16, then uint8
+- Create a tool to generate this stuff for you so it's way easier
+    - "Smart" defaults

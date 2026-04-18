@@ -1,0 +1,48 @@
+{
+    "dictdef2.*": [
+        {
+            "$TT": "INT", "$Tt": "Int", "$tt": "int", "$K": "int",
+            "$VV": "INT", "$Vv": "Int", "$vv": "int", "$U": "int",
+            "$REFKEY": "(a)",
+            "$FREEKEY": "NULL",
+            "$FREEVALUE": "NULL",
+            "$SIZEOFKEY": "sizeof(int)",
+            "$ZEROKEY": "NULL",
+            "$ZEROVALUE": "NULL",
+            "$EQUAL_KEYS": "a == b",
+            "$OPT_KEY_IS_TRIVIALLY_HASHABLE": "true",
+            "$OPT_KEY_IS_PTR": "false",
+            "$OPT_KEY_IS_SMALLER_THAN_SIZE_T": "true",
+            "$OPT_HASH_USE_DEFAULT": "true",
+            "$OPT_HASH_NON_DEFAULT_FUNC": "NULL",
+            "$MALLOC": "malloc",
+            "$REALLOC": "realloc",
+            "$FREE": "free",
+            "$H_INCLUDES": [
+            ],
+            "$C_INCLUDES": ""
+        },
+        {
+            "$TT": "STRING", "$Tt": "String", "$tt": "string", "$K": "char *",
+            "$VV": "INT", "$Vv": "Int", "$vv": "int", "$U": "int",
+            "$REFKEY": "(a)",
+            "$FREEKEY": "free(a)",
+            "$FREEVALUE": "NULL",
+            "$SIZEOFKEY": "sizeof(char *)",
+            "$ZEROKEY": "(!a)",
+            "$ZEROVALUE": "NULL",
+            "$EQUAL_KEYS": "strcmp(a, b) == 0",
+            "$OPT_KEY_IS_TRIVIALLY_HASHABLE": "false",
+            "$OPT_KEY_IS_PTR": "true",
+            "$OPT_KEY_IS_SMALLER_THAN_SIZE_T": "false",
+            "$OPT_HASH_USE_DEFAULT": "true",
+            "$OPT_HASH_NON_DEFAULT_ALG": "NULL",
+            "$MALLOC": "malloc",
+            "$REALLOC": "realloc",
+            "$FREE": "free",
+            "$H_INCLUDES": [
+            ],
+            "$C_INCLUDES": ""
+        }
+    ]
+}
