@@ -45,24 +45,28 @@ static void *_dict_$tt_$vv_create_index_table(uint64_t cap)
     if (cap <= UINT8_MAX)
     {
         uint8_t *ptr = (uint8_t *)$MALLOC(sizeof(uint8_t) * cap);
+        assert(ptr);
         for (uint8_t i = 0; i < cap; i++) { ptr[i] = UINT8_MAX; }
         return ptr;
     }
     else if (cap <= UINT16_MAX)
     {
         uint16_t *ptr = (uint16_t *)$MALLOC(sizeof(uint16_t) * cap);
+        assert(ptr);
         for (uint16_t i = 0; i < cap; i++) { ptr[i] = UINT16_MAX; }
         return ptr;
     }
     else if (cap <= UINT32_MAX)
     {
         uint32_t *ptr = (uint32_t *)$MALLOC(sizeof(uint32_t) * cap);
+        assert(ptr);
         for (uint32_t i = 0; i < cap; i++) { ptr[i] = UINT32_MAX; }
         return ptr;
     }
     else
     {
         uint64_t *ptr = (uint64_t *)$MALLOC(sizeof(uint64_t) * cap);
+        assert(ptr);
         for (uint64_t i = 0; i < cap; i++) { ptr[i] = UINT64_MAX; }
         return ptr;
     }
@@ -71,6 +75,7 @@ static void *_dict_$tt_$vv_create_index_table(uint64_t cap)
 static void *_dict_$tt_$vv_reset_index_table(void *index_table, uint64_t cap)
 {
     assert(cap != 0);
+    assert(index_table);
 
     if (cap <= UINT8_MAX)
     {
@@ -101,6 +106,7 @@ static void *_dict_$tt_$vv_reset_index_table(void *index_table, uint64_t cap)
 static bool _dict_$tt_$vv_index_table_is_tomb(void *index_table, uint64_t cap, uint64_t index)
 {
     assert(index < cap);
+    assert(index_table);
 
     if (cap <= UINT8_MAX)
     {
@@ -127,6 +133,8 @@ static bool _dict_$tt_$vv_index_table_is_tomb(void *index_table, uint64_t cap, u
 // Set the index table at index to the entry's position (index)
 #define _dict_$tt_$vv_index_table_set_pos(IndexTable, Cap, Index, Pos) \
 do { \
+    assert((Index) < (Cap)); \
+    assert(IndexTable); \
     if ((Cap) <= UINT8_MAX) { \
         uint8_t *ptr = (uint8_t *)(IndexTable); \
         ptr[(Index)] = (Pos); \
@@ -148,6 +156,8 @@ do { \
 // Set a tombstone at the index
 #define _dict_$tt_$vv_index_table_set_tombstone(IndexTable, Cap, Index) \
 do { \
+    assert((Index) < (Cap)); \
+    assert(IndexTable); \
     if ((Cap) <= UINT8_MAX) { \
         uint8_t *ptr = (uint8_t *)(IndexTable); \
         ptr[(Index)] = TOMBSTONE8; \
@@ -168,6 +178,8 @@ do { \
 
 static uint64_t _dict_$tt_$vv_index_table_get_pos(void *index_table, uint64_t cap, uint64_t index)
 {
+    assert(index_table);
+    assert(index < cap);
     if (cap <= UINT8_MAX) {
         uint8_t *ptr = (uint8_t *)index_table;
         return (uint64_t)ptr[index];
@@ -190,6 +202,8 @@ static uint64_t _dict_$tt_$vv_index_table_get_pos(void *index_table, uint64_t ca
 // If so, break out of some loop which contains this preserving Index to
 // remain as an index into IndexTable and entries which can store an entry.
 #define _dict_$tt_$vv_index_table_get_break_on_empty_or_tomb(IndexTable, Cap, Index) \
+    assert((Index) < (Cap)); \
+    assert(IndexTable); \
     if ((Cap) <= UINT8_MAX) { \
         uint8_t *ptr = (uint8_t *)(IndexTable); \
         const uint8_t LValue = ptr[(Index)]; \
@@ -212,6 +226,8 @@ static uint64_t _dict_$tt_$vv_index_table_get_pos(void *index_table, uint64_t ca
     } \
 
 #define _dict_$tt_$vv_index_table_get_break_on_empty_continue_on_tomb(IndexTable, Cap, Index) \
+    assert((Index) < (Cap)); \
+    assert(IndexTable); \
     if ((Cap) <= UINT8_MAX) { \
         uint8_t *ptr = (uint8_t *)(IndexTable); \
         const uint8_t LValue = ptr[(Index)]; \
@@ -240,6 +256,8 @@ static uint64_t _dict_$tt_$vv_index_table_get_pos(void *index_table, uint64_t ca
 static DictNode$Tt$Vv *_dict_$tt_$vv_table_lookup(Dict$Tt$Vv *self, uint64_t index)
 {
     assert(self);
+    assert(self->index_table);
+    assert(self->entries);
     assert(index < self->cap);
 
     if (self->cap <= UINT8_MAX)
@@ -291,6 +309,7 @@ Dict$Tt$Vv dict_$tt_$vv_init_reserve(uint64_t cap)
 
 Dict$Tt$Vv *dict_$tt_$vv_new_reserve(uint64_t cap)
 {
+    assert(cap >= DICT_$TT_$VV_MIN_CAP);
     Dict$Tt$Vv *self = (Dict$Tt$Vv *)$MALLOC(sizeof(*self));
     assert(self);
 
@@ -328,11 +347,13 @@ void dict_$tt_$vv_deinit(Dict$Tt$Vv *self)
             }
         }
         $FREE(self->entries);
+        self->entries = NULL;
     }
 
     if (self->index_table)
     {
         $FREE(self->index_table);
+        self->index_table = NULL;
     }
 }
 
@@ -350,10 +371,10 @@ void dict_$tt_$vv_reset(Dict$Tt$Vv *self)
     assert(self);
     assert(self->entries);
 
-    for (uint64_t i = 0; i < dict_$tt_$vv_size(self); i++) {
-        DictNode$Tt$Vv *node = dict_$tt_$vv_at(self, i);
-        if (!node) continue;
-
+    for (DictNode$Tt$Vv *node = dict_$tt_$vv_iter(self);
+         node;
+         node = dict_$tt_$vv_next(self, node))
+    {
         if (!DEF_DICT_$TT_$VV_ZEROKEY(node->key)) {
             DEF_DICT_$TT_$VV_FREEKEY(node->key);
         }
@@ -361,12 +382,12 @@ void dict_$tt_$vv_reset(Dict$Tt$Vv *self)
         if (DEF_DICT_$TT_$VV_ZEROVALUE(node->value)) {
             DEF_DICT_$TT_$VV_FREEVALUE(node->value);
         }
-
     }
 
     _dict_$tt_$vv_reset_index_table(self->index_table, self->cap);
 
     self->len = 0;
+    self->tombcount = 0;
 }
 
 static uint64_t _dict_$tt_$vv_hash($K key)
@@ -390,6 +411,86 @@ static uint64_t _dict_$tt_$vv_hash($K key)
 #endif
 }
 
+static void _dict_$tt_$vv_resize(Dict$Tt$Vv *self, uint64_t newcap)
+{
+    assert(self);
+    assert(newcap > self->len);
+
+    if (self->cap == newcap)
+    {
+        return;
+    }
+
+    void *new_index_table = self->index_table;
+    if (newcap > self->cap)
+    {
+        self->entries = (DictNode$Tt$Vv *)$REALLOC(self->entries, sizeof(DictNode$Tt$Vv) * newcap);
+        new_index_table = _dict_$tt_$vv_create_index_table(newcap);
+        assert(new_index_table);
+    }
+    else // newcap < self->cap
+    {
+        // compact in place
+        // entries will be compacted in the below for loop
+        _dict_$tt_$vv_reset_index_table(new_index_table, newcap);
+    }
+    const bool compacting = (new_index_table == self->index_table);
+
+    for (uint64_t read_pos = 0, write_pos = 0;
+         read_pos < dict_$tt_$vv_size(self);
+         read_pos++)
+    {
+        DictNode$Tt$Vv *read_entry = dict_$tt_$vv_at(self, read_pos);
+        if (!read_entry) continue;
+
+        // reading the raw entry because it's OK to clobber tombstones here
+        uint64_t pos = read_pos;
+        uint64_t entry_hash = read_entry->hash;
+        if (compacting)
+        {
+            DictNode$Tt$Vv *write_entry = &self->entries[write_pos];
+            memcpy(write_entry, read_entry, sizeof(*write_entry));
+
+            pos = write_pos;
+            entry_hash = write_entry->hash;
+
+            write_pos++;
+        }
+
+        uint64_t h, perturb;
+        h = perturb = entry_hash;
+        uint64_t i = h % newcap;
+
+        while (1)
+        {
+            _dict_$tt_$vv_index_table_get_break_on_empty_or_tomb(new_index_table, newcap, i);
+            i = (5 * i + perturb + 1) % newcap;
+            perturb >>= 5;
+        }
+        _dict_$tt_$vv_index_table_set_pos(new_index_table, newcap, i, pos);
+    }
+
+    // not being shrunk in size
+    if (!compacting)
+    {
+        $FREE(self->index_table);
+        self->index_table = new_index_table;
+
+        // we changed capacity not compacted, new cap
+        self->cap = newcap;
+    }
+    else
+    {
+        // there shall be NO TOMBS IN LEN AFTER COMPACT
+        for (uint64_t i = 0; i < self->len; i++)
+        {
+            assert(dict_$tt_$vv_at(self, i));
+        }
+
+        self->tombcount = 0;
+    }
+}
+
 // https://www.youtube.com/watch?v=p33CVV29OG8
 bool dict_$tt_$vv_set(Dict$Tt$Vv *self, $K key, $U value)
 {
@@ -401,36 +502,13 @@ bool dict_$tt_$vv_set(Dict$Tt$Vv *self, $K key, $U value)
 
     if (DICT_$TT_$VV_LOAD_FACTOR_READY(self->len+1, self->cap))
     {
-        self->entries = (DictNode$Tt$Vv *)$REALLOC(self->entries, sizeof(DictNode$Tt$Vv) * self->cap * DICT_$TT_$VV_GROWTH_FACTOR);
-        const uint64_t newcap = self->cap * DICT_$TT_$VV_GROWTH_FACTOR;
-
-        void *new_index_table = _dict_$tt_$vv_create_index_table(newcap);
-        assert(new_index_table);
-
-        for (uint64_t pos = 0; pos < dict_$tt_$vv_size(self); pos++) {
-            DictNode$Tt$Vv *entry = dict_$tt_$vv_at(self, pos);
-            if (!entry) continue;
-
-            uint64_t h, perturb;
-            h = perturb = entry->hash;
-            uint64_t i = h % newcap;
-
-            while (1)
-            {
-                _dict_$tt_$vv_index_table_get_break_on_empty_or_tomb(new_index_table, newcap, i);
-                i = (5 * i + perturb + 1) % newcap;
-                perturb >>= 5;
-            }
-            _dict_$tt_$vv_index_table_set_pos(new_index_table, newcap, i, pos);
-        }
-
-        $FREE(self->index_table);
-        self->index_table = new_index_table;
-        self->cap = newcap;
+        _dict_$tt_$vv_resize(self, self->cap * DICT_$TT_$VV_GROWTH_FACTOR);
     }
 
     const DictNode$Tt$Vv node = {
+    #if ! $OPT_KEY_IS_TRIVIALLY_HASHABLE
         .hash = _dict_$tt_$vv_hash(key),
+    #endif
         .key = key,
         .value = value,
     #if ! $OPT_KEY_IS_PTR
@@ -587,11 +665,18 @@ void dict_$tt_$vv_remove(Dict$Tt$Vv *self, $K key)
         #endif
 
             _dict_$tt_$vv_index_table_set_tombstone(self->index_table, self->cap, i);
+            self->tombcount++;
             break;
         }
 
         i = (5 * i + perturb + 1) % self->cap;
         perturb >>= 5;
+    }
+
+    if (self->tombcount > (self->len/2) && (self->len > DICT_$TT_$VV_DEFAULT_SIZE))
+    {
+        assert((self->len * 3 / 2) < self->cap);
+        _dict_$tt_$vv_resize(self, self->len * 3 / 2);
     }
 }
 

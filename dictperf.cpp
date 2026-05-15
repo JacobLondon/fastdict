@@ -85,7 +85,7 @@ int main()
     std::unordered_map<std::string, int> cpps_dict;
     char buf[1024];
 
-    elements = 1000000;
+    elements = 100000;
     start = now();
     for (volatile size_t i = 0; i < elements; i++)
     {

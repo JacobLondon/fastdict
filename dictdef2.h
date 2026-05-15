@@ -32,8 +32,15 @@
 $H_INCLUDES
 
 typedef struct DictNode$Tt$Vv {
+#if $OPT_KEY_IS_TRIVIALLY_HASHABLE
+    union {
+        uint64_t hash; // TODO: This could be the size of the key, not 64-bits
+        $K key;
+    };
+#else
     uint64_t hash;
     $K key;
+#endif
 
     // If key is a pointer, key==NULL is a tombstone marker.
     // Otherwise, we must mark the tombstone in some other way.
@@ -56,6 +63,7 @@ typedef struct Dict$Tt$Vv {
 
     uint64_t len; // the number of elements compact in data
     uint64_t cap; // the maximum allocated size of both data and index_table
+    uint64_t tombcount; // the number of tombstones
 } Dict$Tt$Vv;
 
 DEF_PROTO Dict$Tt$Vv dict_$tt_$vv_init_reserve(uint64_t cap);

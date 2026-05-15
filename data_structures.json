@@ -23,6 +23,28 @@
             "$C_INCLUDES": ""
         },
         {
+            "$TT": "LONG", "$Tt": "Long", "$tt": "long", "$K": "long",
+            "$VV": "LONG", "$Vv": "Long", "$vv": "long", "$U": "long",
+            "$REFKEY": "(a)",
+            "$FREEKEY": "NULL",
+            "$FREEVALUE": "NULL",
+            "$SIZEOFKEY": "sizeof(int)",
+            "$ZEROKEY": "NULL",
+            "$ZEROVALUE": "NULL",
+            "$EQUAL_KEYS": "a == b",
+            "$OPT_KEY_IS_TRIVIALLY_HASHABLE": "true",
+            "$OPT_KEY_IS_PTR": "false",
+            "$OPT_KEY_IS_SMALLER_THAN_SIZE_T": "true",
+            "$OPT_HASH_USE_DEFAULT": "true",
+            "$OPT_HASH_NON_DEFAULT_FUNC": "NULL",
+            "$MALLOC": "malloc",
+            "$REALLOC": "realloc",
+            "$FREE": "free",
+            "$H_INCLUDES": [
+            ],
+            "$C_INCLUDES": ""
+        },
+        {
             "$TT": "STRING", "$Tt": "String", "$tt": "string", "$K": "char *",
             "$VV": "INT", "$Vv": "Int", "$vv": "int", "$U": "int",
             "$REFKEY": "(a)",
