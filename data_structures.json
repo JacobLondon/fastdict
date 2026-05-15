@@ -28,7 +28,7 @@
             "$REFKEY": "(a)",
             "$FREEKEY": "NULL",
             "$FREEVALUE": "NULL",
-            "$SIZEOFKEY": "sizeof(int)",
+            "$SIZEOFKEY": "sizeof(long)",
             "$ZEROKEY": "NULL",
             "$ZEROVALUE": "NULL",
             "$EQUAL_KEYS": "a == b",
